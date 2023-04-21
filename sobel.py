@@ -31,7 +31,9 @@ def non_maximum_suppression(Gy, height, width, T2, T1):
                     E[h][w] = Gy[h][w]
                 else:
                     E[h][w] = 0
-
+   
+    # E = np.clip(E, 0, 255)
+    # print(E)
     # Thresholding
     for h in range(0, height):
         for w in range(0, width):
@@ -81,6 +83,7 @@ def non_maximum_suppression(Gy, height, width, T2, T1):
     # Show image
     edge_img = Image.fromarray(result)
     edge_img.show()
+    return edge_img
 
 def vertical_sobel(img, img_arr):
     # Kernel in y direction 
@@ -92,9 +95,11 @@ def vertical_sobel(img, img_arr):
 
     # Thresholds - Can use percentile as well  
     T2 = np.mean(np.abs(Gy)) * 6
-    T1 = np.mean(np.abs(Gy)) * 4
+    T1 = np.mean(np.abs(Gy)) * 5
 
-    non_maximum_suppression(Gy, height, width, T2, T1)
+    print(T2)
+
+    return non_maximum_suppression(Gy, height, width, T2, T1)
 
 
 
