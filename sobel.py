@@ -94,8 +94,8 @@ def vertical_sobel(img, img_arr):
     Gy = convolve2d(img_arr, Ky, "same")
 
     # Thresholds - Can use percentile as well  
-    T2 = np.mean(np.abs(Gy)) * 6
-    T1 = np.mean(np.abs(Gy)) * 5
+    T2 = np.mean(np.abs(Gy)) * 5
+    T1 = np.mean(np.abs(Gy)) * 4
 
     print(T2)
 

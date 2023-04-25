@@ -9,15 +9,15 @@ import math
 def search_carplate(edge_img, greyscale_img): 
     img_arr = np.array(edge_img)
     width, height = edge_img.size
-    window_size_arr = [(130, 330), (100, 275), (70, 220)]
+    window_size_arr = [(130, 335), (100, 275), (70, 220)]
     iter = 0 
     result = None 
 
     while iter < (len(window_size_arr)) and result == None:
         candidate_starting_point = []
         while iter < (len(window_size_arr)) and len(candidate_starting_point) < 1:
-            print("Check", window_size_arr[iter])
-            pixel_range = (window_size_arr[iter][0]*window_size_arr[iter][1]*0.13)
+            # print("Check", window_size_arr[iter])
+            pixel_range = (window_size_arr[iter][0]*window_size_arr[iter][1]*0.1)
             candidate_starting_point = flag_candidate(pixel_range, window_size_arr[iter], img_arr, width, height)
             print("candidate", candidate_starting_point)
             iter += 1
@@ -52,8 +52,8 @@ def flag_candidate(pixel_range, window_size, img_arr, width, height):
 
                 candidate_starting_point.append(start_point)
              
-    print(number_of_candidate)
-    print(candidate_starting_point)
+    # print(number_of_candidate)
+    # print(candidate_starting_point)
 
     return candidate_starting_point
 
@@ -134,8 +134,8 @@ def sort_candidate(candidate_starting_point, window_size, img, img_arr, greyscal
     else:
         return filter_candidates[0]
     
-    # if len(filter_candidates_pos) == 1:
-    #     return filter_candidates_pos[0]
+    if len(filter_candidates_pos) == 1:
+        return filter_candidates_pos[0]
     
     ############################# Vertical Projection 
     # cv2_gray_scale = cv2.cvtColor(greyscale_img, cv2.COLOR_BGR2GRAY)
@@ -144,34 +144,42 @@ def sort_candidate(candidate_starting_point, window_size, img, img_arr, greyscal
     # cv2.imshow("Threshold_image", threshold_image)
     # cv2.waitKey(0)
     gap_arr = []
-    if len(filter_candidates_pos) > 0: 
+    if len(filter_candidates_pos) > 1: 
         for i in range(0, len(filter_candidates_pos)):
             window_arr = threshold_image[filter_candidates_pos[i][0]: filter_candidates_pos[i][0] + window_size[0]]
             window_arr = window_arr[:, filter_candidates_pos[i][1]: filter_candidates_pos[i][1] + window_size[1]]
-            cv2.imshow("Threshold_image", window_arr)
-            cv2.waitKey(0)
+            # cv2.imshow("Threshold_image", window_arr)
+            # cv2.waitKey(0)
             vertical_projection = np.sum(window_arr, axis=0)
             vertical_projection = vertical_projection/255
 
             print(vertical_projection)
 
             ## Show vertical projection histogram 
-            blankImage = np.zeros_like(window_arr)
-            for i, value in enumerate(vertical_projection):
-                cv2.line(blankImage, (i, 0), (i, window_size[0]-int(value)), (255, 255, 255), 1)
-            cv2.imshow("New Histogram Projection", blankImage)
-            cv2.waitKey(0)
+            # blankImage = np.zeros_like(window_arr)
+            # for i, value in enumerate(vertical_projection):
+            #     cv2.line(blankImage, (i, 0), (i, window_size[0]-int(value)), (255, 255, 255), 1)
+            # cv2.imshow("New Histogram Projection", blankImage)
+            # cv2.waitKey(0)
 
             # Find the gaps between charcters 
             # Set a threshold to the gap 
             # Must convert in terms of ratio!!
-            gap_length = round(window_size[1]*0.05)
+            gap_length = round(window_size[1]*0.15)
             
-            gap_thres = round(window_size[1]*0.07)
-            non_gap_thres = round(window_size[1]*0.09)
+            gap_thres = round(window_size[1]*0.06)
+            non_gap_thres = round(window_size[1]*0.08)
 
-            char_length_min = round(window_size[1]*0.04)
-            char_length_max = round(window_size[1]*0.17)
+            char_length_min = round(window_size[1]*0.03)
+            char_length_max = round(window_size[1]*0.20)
+            
+            # gap_length = round(window_size[1]*0.15)
+            
+            # gap_thres = round(window_size[1]*0.06)
+            # non_gap_thres = round(window_size[1]*0.09)
+
+            # char_length_min = round(window_size[1]*0.04)
+            # char_length_max = round(window_size[1]*0.10)
 
             print(gap_length, gap_thres, non_gap_thres, char_length_min, char_length_max)
             num_gap = 0
@@ -231,8 +239,22 @@ def sort_candidate(candidate_starting_point, window_size, img, img_arr, greyscal
             gap_arr.append(tup)
 
     print(gap_arr)
+    total_arr = []
+    max_gap = 0
+    max_char  = 0 
     for i in range(0, len(gap_arr)):
-        if gap_arr[i][0] >= 2 and gap_arr[i][0] <= 6 and gap_arr[i][1] >= 3 and gap_arr[i][1] <= 7: 
+        if gap_arr[i][0] >= 2 and gap_arr[i][0] <= 6 and gap_arr[i][1] >= 2 and gap_arr[i][1] <= 7: 
+            if gap_arr[i][0] > max_gap:
+                max_gap = gap_arr[i][0]
+            if gap_arr[i][1] > max_char:
+                max_char = gap_arr[i][1]
+
+    print("max gap", max_gap)
+    print("max_char", max_char)
+
+    for i in range(0, len(gap_arr)):
+        if gap_arr[i][0] == max_gap and gap_arr[i][1] == max_char:
+            print("result", filter_candidates_pos[i])
             return filter_candidates_pos[i]
     return None
 
