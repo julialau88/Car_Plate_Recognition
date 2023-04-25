@@ -7,7 +7,7 @@ def unsharp(kernel_size, img):
     k = np.ones(kernel)/kernel
 
     # img_blur = img.filter(ImageFilter.Kernel((kernel_size, kernel_size), k))
-    img_blur = img.filter(ImageFilter.MedianFilter((3)))
+    img_blur = img.filter(ImageFilter.MedianFilter((kernel_size)))
 
     unsharp_mask = ImageChops.subtract(img, img_blur)
 

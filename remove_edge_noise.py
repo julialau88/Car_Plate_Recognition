@@ -1,7 +1,7 @@
 import numpy as np 
 from PIL import Image
 
-def remove_edge_noise(edge_img):
+def remove_edge_noise(edge_img, window_size):
     width, height = edge_img.size 
     E = np.array(edge_img)
 
@@ -30,8 +30,8 @@ def remove_edge_noise(edge_img):
     # T_short = 15
     
     # If car plate is further away, the lines will be shorter
-    T_long = 70
-    T_short = 8
+    T_long = window_size[0]
+    T_short = window_size[0] * 0.1
 
     for i in range(0, height):
         for j  in range(0, width):

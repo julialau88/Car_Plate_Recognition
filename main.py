@@ -6,20 +6,25 @@ from unsharp import unsharp
 from sobel import vertical_sobel 
 from search_carplate import search_carplate
 from remove_edge_noise import remove_edge_noise
-from skimage import filters
-from skimage.io import imread, imsave
+from segmentation import remove_background
 import matplotlib.pyplot as plt
-from scipy.signal import convolve2d
 
-
+"""
+Main function to run the algorithm, which will invoke various methods to run the entire 
+car plate detection algorithm 
+"""
 def main():
-    img = Image.open("Images/Set1/001.jpg").convert('L')
+    img = Image.open("Images/Set1/004.jpg").convert('L')
     img = ImageOps.exif_transpose(img)
 
-    size = (900,  900)     # Resize to 1080 by 1080 
+    # Remove unnecessary background
+    # img = remove_background(img)
+
+    # Image resize 
+    size = (900,  900)  
     img =  img.resize(size)
-    greyscale_img = img.resize(size)
-    img_arr = np.array(img)
+    img_arr = np.array(img) # Image array 
+    greyscale_img = img.resize(size) # Greyscale image
 
     # Show image on plt
     fig, ax = plt.subplots(1, 1, figsize=(12, 7))
@@ -27,34 +32,35 @@ def main():
     ax.set_title('Original Image'), ax.imshow(img)
     plt.show()
 
+    # Unsharp image to remove blur & increase contrast with histogram equalisation 
+    img = unsharp(3, img)
+    img = ImageOps.equalize(img, mask = None)
+
+    # Gaussian blurring
     img = gaussian(5, img)
 
-    img = unsharp(3, img)
+    img.show() 
 
     edge_img = vertical_sobel(img, img_arr)
 
-    edge_img = remove_edge_noise(edge_img)
+    # Next, search carplate 
+    noise_removal_window_size = (100, 275)
+
+    edge_img = remove_edge_noise(edge_img, noise_removal_window_size)
     edge_img.show()
 
-    # Next, search carplate 
-    # (height, width)
-    # window_size = (150, 330) # window size for close up image 
-    window_size = (75, 220) 
+    window_size, car_plate_position = search_carplate(edge_img, greyscale_img)
 
-    pixel_range = (window_size[0]*window_size[1]*0.21)
-    search_carplate(pixel_range, window_size, edge_img, greyscale_img)
-
-
-    # edge_img1 = np.array(edge_img)
-    # height1 = 555
-    # width1 = 240
-    # edge_img1 = edge_img1[height1:height1+window_size[0]]
-    # edge_img1 = edge_img1[:, width1:(width1+window_size[1])]
-    # kernel = np.ones((4,10))
-    # G = convolve2d(edge_img1, kernel, "same")
-    # # print(edge_img1)
-    # edge_img1 = Image.fromarray(edge_img1)
-    # edge_img1.show() 
+    if car_plate_position == None:
+        print("Cannot find carplate!")
+    else:
+        edge_img1 = np.array(img)
+        height1 = car_plate_position[0]
+        width1 = car_plate_position[1]
+        edge_img1 = edge_img1[(height1):(height1+window_size[0])]
+        edge_img1 = edge_img1[:, (width1):(width1+window_size[1])]
+        edge_img1 = Image.fromarray(edge_img1)
+        edge_img1.show() 
 
 
 if __name__ == "__main__": 
