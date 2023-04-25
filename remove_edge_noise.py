@@ -26,8 +26,6 @@ def remove_edge_noise(edge_img, window_size):
                     else:
                         N[i][j] = max(N[i+2][j-1], N[i+2][j], N[i+2][j+1], N[i+1][j-2], N[i+1][j+2], N[i][j+2]) + 1
 
-    # T_long = 100
-    # T_short = 15
     
     # If car plate is further away, the lines will be shorter
     T_long = window_size[0]

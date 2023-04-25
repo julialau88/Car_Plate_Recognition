@@ -6,28 +6,24 @@ import cv2
 from subblocks import blockshaped
 import math
 
-def search_carplate(edge_img, greyscale_img): 
+def search_carplate(window_size, edge_img, greyscale_img): 
     img_arr = np.array(edge_img)
     width, height = edge_img.size
-    window_size_arr = [(130, 335), (100, 275), (70, 220)]
-    iter = 0 
     result = None 
 
-    while iter < (len(window_size_arr)) and result == None:
-        candidate_starting_point = []
-        while iter < (len(window_size_arr)) and len(candidate_starting_point) < 1:
-            # print("Check", window_size_arr[iter])
-            pixel_range = (window_size_arr[iter][0]*window_size_arr[iter][1]*0.1)
-            candidate_starting_point = flag_candidate(pixel_range, window_size_arr[iter], img_arr, width, height)
-            print("candidate", candidate_starting_point)
-            iter += 1
+    candidate_starting_point = []
+    
+    pixel_range = (window_size[0]*window_size[1]*0.13)
+    candidate_starting_point = flag_candidate(pixel_range, window_size, img_arr, width, height)
+    
+    print("window", window_size)
+    print("candidate", candidate_starting_point)
         
-        if len(candidate_starting_point) > 0:
-            result = sort_candidate(candidate_starting_point, window_size_arr[iter-1], edge_img, img_arr, greyscale_img)
-        elif len(candidate_starting_point) ==  0:
+    if len(candidate_starting_point) > 0:
+            result = sort_candidate(candidate_starting_point, window_size, edge_img, img_arr, greyscale_img)
+    elif len(candidate_starting_point) ==  0:
             result = None
-
-    return window_size_arr[iter-1], result
+    return result
 
 def flag_candidate(pixel_range, window_size, img_arr, width, height):
     number_of_candidate = 0
@@ -165,13 +161,13 @@ def sort_candidate(candidate_starting_point, window_size, img, img_arr, greyscal
             # Find the gaps between charcters 
             # Set a threshold to the gap 
             # Must convert in terms of ratio!!
-            gap_length = round(window_size[1]*0.15)
+            gap_length = round(window_size[1]*0.10)
             
             gap_thres = round(window_size[1]*0.06)
-            non_gap_thres = round(window_size[1]*0.08)
+            non_gap_thres = round(window_size[1]*0.09)
 
             char_length_min = round(window_size[1]*0.03)
-            char_length_max = round(window_size[1]*0.20)
+            char_length_max = round(window_size[1]*0.17)
             
             # gap_length = round(window_size[1]*0.15)
             
@@ -242,18 +238,19 @@ def sort_candidate(candidate_starting_point, window_size, img, img_arr, greyscal
     total_arr = []
     max_gap = 0
     max_char  = 0 
+    car_plate_found = False
     for i in range(0, len(gap_arr)):
-        if gap_arr[i][0] >= 2 and gap_arr[i][0] <= 6 and gap_arr[i][1] >= 2 and gap_arr[i][1] <= 7: 
+        if gap_arr[i][0] >= 2 and gap_arr[i][0] <= 7 and gap_arr[i][1] >= 2 and gap_arr[i][1] <= 7: 
+            car_plate_found = True
             if gap_arr[i][0] > max_gap:
                 max_gap = gap_arr[i][0]
-            if gap_arr[i][1] > max_char:
-                max_char = gap_arr[i][1]
+        
 
     print("max gap", max_gap)
     print("max_char", max_char)
 
     for i in range(0, len(gap_arr)):
-        if gap_arr[i][0] == max_gap and gap_arr[i][1] == max_char:
+        if gap_arr[i][0] == max_gap and car_plate_found:
             print("result", filter_candidates_pos[i])
             return filter_candidates_pos[i]
     return None

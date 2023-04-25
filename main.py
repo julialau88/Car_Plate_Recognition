@@ -14,10 +14,10 @@ Main function to run the algorithm, which will invoke various methods to run the
 car plate detection algorithm 
 """
 def main():
-    for i in range(21, 45, 1):
+    for i in range(7, 8, 1):
         print("---------------------" + str(i) + "---------------------")
-        temp = '0' + str(i) + '.jpg'
-        file = "Images/Set1/" + temp
+        temp = '00' + str(i) + '.jpg'
+        file = "Images/Set2/" + temp
         img = Image.open(file).convert('L')
         img = ImageOps.exif_transpose(img)
 
@@ -44,16 +44,24 @@ def main():
         img = gaussian(5, img)
 
         # img.show() 
-
         edge_img = vertical_sobel(img, img_arr)
 
         # Next, search carplate 
-        noise_removal_window_size = (130, 300)
 
-        edge_img = remove_edge_noise(edge_img, noise_removal_window_size)
-        edge_img.show()
+        # edge_img = remove_edge_noise(edge_img, noise_removal_window_size)
+        # edge_img.show()
 
-        window_size, car_plate_position = search_carplate(edge_img, greyscale_img)
+        window_size_arr = [(130, 335), (100, 275), (70, 220)]
+        car_plate_position = None
+        iter = 0 
+
+        while car_plate_position == None and iter < len(window_size_arr):
+            print("window", window_size_arr[iter])
+            edge_img = remove_edge_noise(edge_img, window_size_arr[iter])
+            # edge_img.show()
+            car_plate_position = search_carplate(window_size_arr[iter], edge_img, greyscale_img)
+            iter += 1
+        
         # window_size_arr = [(130, 330), (100, 275), (70, 220)]
 
         if car_plate_position == None:
@@ -62,8 +70,8 @@ def main():
             edge_img1 = np.array(img)
             height1 = car_plate_position[0]
             width1 = car_plate_position[1]
-            edge_img1 = edge_img1[(height1):(height1+window_size[0])]
-            edge_img1 = edge_img1[:, (width1):(width1+window_size[1])]
+            edge_img1 = edge_img1[(height1):(height1+window_size_arr[iter-1][0])]
+            edge_img1 = edge_img1[:, (width1):(width1+window_size_arr[iter-1][1])]
             edge_img1 = Image.fromarray(edge_img1)
             edge_img1.show() 
 

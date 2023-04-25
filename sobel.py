@@ -82,7 +82,7 @@ def non_maximum_suppression(Gy, height, width, T2, T1):
                         result[h][w] = 1 
     # Show image
     edge_img = Image.fromarray(result)
-    edge_img.show()
+    # edge_img.show()
     return edge_img
 
 def vertical_sobel(img, img_arr):
