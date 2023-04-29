@@ -2,7 +2,15 @@ import numpy as np
 from scipy.signal import convolve2d
 from PIL import Image
 
+"""
+Non-maximum suppression to thin edges 
+@param Gy: Vertical gradient array after Sobel 
+@param height: height of image 
+@param width: width of image 
+@param T2: upper threshold 
+@param T1: lower threshold
 
+"""
 def non_maximum_suppression(Gy, height, width, T2, T1):
     S = np.zeros((height,width))
     E = np.zeros((height,width))
@@ -14,13 +22,13 @@ def non_maximum_suppression(Gy, height, width, T2, T1):
             # Examine horizontal pair 
             ## Checking edges first
             if w == 0:
-                # Just check right pixel
+                # Check right pixel
                 if Gy[h][w+1] < Gy[h][w]:
                     E[h][w] = Gy[h][w]
                 else: 
                     E[h][w] = 0
             elif w == width - 1:
-                # Just check left pixel 
+                # Check left pixel 
                 if Gy[h][w-1] < Gy[h][w]:
                     E[h][w] = Gy[h][w]
                 else: 
@@ -32,8 +40,6 @@ def non_maximum_suppression(Gy, height, width, T2, T1):
                 else:
                     E[h][w] = 0
    
-    # E = np.clip(E, 0, 255)
-    # print(E)
     # Thresholding
     for h in range(0, height):
         for w in range(0, width):
@@ -80,25 +86,30 @@ def non_maximum_suppression(Gy, height, width, T2, T1):
                     # Not edges, check all 
                     if result[h][w+1] == 1 or result[h-1][w] == 1 or result[h-1][w+1] == 1 or result[h][w-1] == 1  or result[h-1][w-1] == 1 or result[h+1][w] == 1 or result[h+1][w-1] == 1 or result[h+1][w+1] == 1:
                         result[h][w] = 1 
-    # Show image
+    # Return image 
     edge_img = Image.fromarray(result)
-    # edge_img.show()
+
     return edge_img
 
+"""
+Vertical Sobel to map out vertical edges 
+@param img: the greyscale enhanced image
+@param img_arr: greyscale enchanced image array 
+@return the edge img 
+"""
 def vertical_sobel(img, img_arr):
     # Kernel in y direction 
     Ky = np.matrix("-1, 0, 1; -2, 0, 2;, -1, 0, 1")
-    width, height = img.size
+    width, height = img.size # Get image size 
     
     # Apply sobel in vertical direction
     Gy = convolve2d(img_arr, Ky, "same")
 
-    # Thresholds - Can use percentile as well  
-    T2 = np.mean(np.abs(Gy)) * 5
-    T1 = np.mean(np.abs(Gy)) * 4
+    # Thresholds - absolute mean gradient value multiplied by a coefficient
+    T2 = np.mean(np.abs(Gy)) * 5 # Upper
+    T1 = np.mean(np.abs(Gy)) * 4 # Lower
 
-    print(T2)
-
+    # Do non-maximum suppression 
     return non_maximum_suppression(Gy, height, width, T2, T1)
 
 

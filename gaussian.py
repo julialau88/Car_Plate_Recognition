@@ -1,6 +1,9 @@
 import numpy as np
-from PIL import Image, ImageFilter
+from PIL import ImageFilter
 
+"""
+Gaussian
+"""
 def gaussian(window_size, img):
     window = window_size**2
     print(window)

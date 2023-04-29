@@ -3,9 +3,12 @@ import numpy as np
 from scipy.signal import convolve2d
 import matplotlib.pyplot as plt
 import cv2
-from subblocks import blockshaped
+
 import math
 
+"""
+
+"""
 def search_carplate(window_size, edge_img, greyscale_img): 
     img_arr = np.array(edge_img)
     width, height = edge_img.size
@@ -16,8 +19,8 @@ def search_carplate(window_size, edge_img, greyscale_img):
     pixel_range = (window_size[0]*window_size[1]*0.13)
     candidate_starting_point = flag_candidate(pixel_range, window_size, img_arr, width, height)
     
-    print("window", window_size)
-    print("candidate", candidate_starting_point)
+    # print("window", window_size)
+    # print("candidate", candidate_starting_point)
         
     if len(candidate_starting_point) > 0:
             result = sort_candidate(candidate_starting_point, window_size, edge_img, img_arr, greyscale_img)
@@ -134,9 +137,10 @@ def sort_candidate(candidate_starting_point, window_size, img, img_arr, greyscal
         return filter_candidates_pos[0]
     
     ############################# Vertical Projection 
-    # cv2_gray_scale = cv2.cvtColor(greyscale_img, cv2.COLOR_BGR2GRAY)
     greyscale_img_arr = np.array(greyscale_img)
     _, threshold_image = cv2.threshold(greyscale_img_arr, 0, 255, cv2.THRESH_BINARY+cv2.THRESH_OTSU)
+    
+    cv2.imwrite("Otsu.png", threshold_image)
     # cv2.imshow("Threshold_image", threshold_image)
     # cv2.waitKey(0)
     gap_arr = []
@@ -149,9 +153,9 @@ def sort_candidate(candidate_starting_point, window_size, img, img_arr, greyscal
             vertical_projection = np.sum(window_arr, axis=0)
             vertical_projection = vertical_projection/255
 
-            print(vertical_projection)
+            # print(vertical_projection)
 
-            ## Show vertical projection histogram 
+            # Show vertical projection histogram 
             # blankImage = np.zeros_like(window_arr)
             # for i, value in enumerate(vertical_projection):
             #     cv2.line(blankImage, (i, 0), (i, window_size[0]-int(value)), (255, 255, 255), 1)
@@ -164,7 +168,7 @@ def sort_candidate(candidate_starting_point, window_size, img, img_arr, greyscal
             gap_length = round(window_size[1]*0.10)
             
             gap_thres = round(window_size[1]*0.06)
-            non_gap_thres = round(window_size[1]*0.09)
+            non_gap_thres = round(window_size[1]*0.09) 
 
             char_length_min = round(window_size[1]*0.03)
             char_length_max = round(window_size[1]*0.17)
