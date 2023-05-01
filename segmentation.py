@@ -8,9 +8,6 @@ Background removal function
 @return image with background removed
 """
 def remove_background(image):
-    # Load the image
-    # image = Image.open("Images/Set1/010.jpg")
-    # image = ImageOps.exif_transpose(image)
 
     # Convert the image to grayscale
     gray_image = image.convert("L")
