@@ -64,11 +64,16 @@ def Forward_Hidden_Output(wkj, Output_Neurons, Hidden_Neurons, OutJ, bias_k, Net
     return NetK, OutK
 
 # Step 5. Check for the global error or number of iterations.
-def Check_for_End(target_arr, iter, error_threshold):
+def Check_for_End(OutK, target_arr, iter, max_iter, error_threshold):
     # Check whether the total error is less than the error set by the user or the number of iterations is reached.
+    # Calculate total error 
+
     # returns true or false
+
     # If TRUE, proceed to Step 10
-    return 0 
+    if iter >= max_iter:
+        return True
+    
 
 def main():
     ### Initialisation of parameters 
