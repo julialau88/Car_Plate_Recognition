@@ -20,10 +20,15 @@ def read_files(file):
     # Reading of Input File, and Target File.
     # Ask the user to enter the number of input, hidden and output neurons.
     input_img = Image.open(file).convert('L')
+    
+    # # ###### Image resize 
+    size = (40,  50)  
+    input_img =  input_img.resize(size)
+
     input_img_arr = np.array(input_img) 
     width, height = input_img.size
 
-    return input_img_arr, width, height
+    return input_img,  input_img_arr, width, height
 
 ##### Step 3. Forward Propagation from Input -> Hidden Layer.
 def Forward_Input_Hidden(Input_Neurons, Hidden_Neurons, input_img_arr, bias_j, NetJ, OutJ, wji):
@@ -31,6 +36,7 @@ def Forward_Input_Hidden(Input_Neurons, Hidden_Neurons, input_img_arr, bias_j, N
     # Obtain the results at each neuron in the hidden layer
     # Initialise NetJ --> same size as hidden neurons 
 
+    # print(bias_j)
     # Loop through hidden neurons 
     for j in range(0, Hidden_Neurons):
         # For each hidden neuron. loop through input neurons to calculate NetJ
@@ -59,6 +65,7 @@ def Forward_Hidden_Output(wkj, Output_Neurons, Hidden_Neurons, OutJ, bias_k, Net
         NetK[k] += bias_k[k][0]
     
     # Calculate OutK with NetK
+    # print(NetK)
     for k in range(0,Output_Neurons):
         OutK[k] = 1/(1 + math.exp(-(NetK[k])))
     
@@ -73,16 +80,22 @@ def Check_for_End(OutK, target_arr, iter, max_iter, error_threshold):
     ## Here want to set margin of error
     ## For example: if target value is 1, if ouput is 0.9, we consider it as pass
     for i in range(0, len(target_arr)):
-        error = 0.5*(target_arr[i] - OutK[i])**2
+        # print(target_arr)
+        # print(OutK)
+        error = 0.5*((target_arr[i] - OutK[i])**2)
         total_error += error
         error_arr.append(error)
+        
 
+    print("TOTAL ERROR IS",  total_error)
     # returns true or false
-    if total_error < error_threshold:
+    if total_error <= error_threshold:
+        print("ERROR THRESHOLD MET")
         return True, error_arr 
 
     # If TRUE, proceed to Step 10
     if iter >= max_iter - 1:
+        print("MAX ITER REACHED")
         return True, error_arr
 
     return False, error_arr 
@@ -111,18 +124,20 @@ def Weight_Bias_Correction_Hidden(OutK, target_arr, OutJ, Hidden_Neurons, Output
     delta_kl = np.zeros(Output_Neurons)
     delta_WJ = np.zeros((Hidden_Neurons, Input_Neurons))
     delta_bias_j = np.zeros(Hidden_Neurons)
-    sum_k_l = 0
+    sum_k_l = np.zeros(Hidden_Neurons)
     
     for k in range(0, len(OutK)):
         delta_k_value = (OutK[k] - target_arr[k])*(OutK[k]*(1-OutK[k]))
         delta_kl[k] =  delta_k_value
     
-    for l in range(0, len(OutK)):
-        sum_k_l +=  delta_kl[l]* wkj[l][0]   
+    for j in range(0, len(OutJ)):
+        for l in range(0, len(OutK)):
+            sum_k_l[j] +=  delta_kl[l]* wkj[l][j] 
+
     for j in range(0, len(OutJ)):
         for i in range(0, len(input_img_arr)):
-            delta_WJ[j][i] = input_img_arr[i] * (OutJ[j]*(1-OutJ[j])) * sum_k_l   
-            delta_bias_j[j] = (OutJ[j]*(1-OutJ[j])) *  sum_k_l   
+            delta_WJ[j][i] = input_img_arr[i] * (OutJ[j]*(1-OutJ[j])) * sum_k_l[j]   
+            delta_bias_j[j] = (OutJ[j]*(1-OutJ[j])) *  sum_k_l[j]   
     
     return  delta_WJ, delta_bias_j  
 
@@ -147,9 +162,9 @@ def Weight_Bias_Update(wji, wkj, Hidden_Neurons, Input_Neurons, Output_Neurons, 
     for j in range(0, Hidden_Neurons):       
         bias_j_new[j] = bias_j[j] - (n*delta_bias_j[j]) 
 
-    # Loop through hidden neurons 
+    # Loop through output neurons 
     for k in range(0, Output_Neurons):
-        # For each hidden neuron. loop through input neurons to calculate NetJ
+        # For each output neuron. loop through input neurons to calculate NetJ
         for j in range(0, Hidden_Neurons):
             wkj_new[k][j] =   wkj[k][j] - (n*delta_wk[k][j])  
     
@@ -167,62 +182,3 @@ def Saving_Weights_Bias(wji, bias_j, wkj, bias_k):
     # Save weight_k_j and bias_k
     np.save("wkj.npy", wkj)
     np.save("bias_k.npy", bias_k)
-
-
-###### Main function 
-def main():
-    ### Initialisation of parameters 
-    file = "Enter_file_here"
-    
-    # Input_Neurons: Initialise total number of neurons
-    Input_Neurons = 2
-
-    # Hidden_Neurons: Initialise number of hidden neurons
-    Hidden_Neurons = 2
-
-    # Output_Neurons: Initialise number of output neurons
-    Output_Neurons = 2
-
-    # Input arr is the image
-    input_arr, width, height = read_files(file)
-    input_arr = sobel(width, height, input_arr)
-    input_arr = input_arr.flatten()
-
-    # Target here is the expected output 
-    # Target here depends on what the alphabet is 
-    # How to define target based on output?
-    target_arr = [0, 1, 0]
-
-    # Weight initialisation 
-    wji, wkj, bias_j, bias_k = Weight_Initialization(Input_Neurons, Hidden_Neurons, Output_Neurons)
-    iter = 0
-    max_iter = 20 
-    error_threshold = 0.1
-
-    while True: 
-        NetJ = np.zeros(Hidden_Neurons)
-        OutJ = np.zeros(Hidden_Neurons)
-        NetJ, OutJ = Forward_Input_Hidden(Input_Neurons, Hidden_Neurons, input_arr, bias_j, NetJ, OutJ, wji)
-
-        NetK = np.zeros(Output_Neurons)
-        OutK = np.zeros(Output_Neurons)
-        NetK, OutK = Forward_Hidden_Output(wkj, Output_Neurons, Hidden_Neurons, OutJ, bias_k, NetK, OutK)
-
-        is_end, error_arr = Check_for_End(OutK, target_arr, iter, max_iter, error_threshold)
-        iter += 1
-
-        if is_end: 
-            # Go to Step 10
-            # Save weights and biases
-            Saving_Weights_Bias(wji, bias_j, wkj, bias_k)
-            break
-        else: 
-            delta_bias_k, delta_wk = Weight_Bias_Correction_Output(OutK, target_arr, OutJ, Hidden_Neurons, Output_Neurons)
-            delta_WJ, delta_bias_j  = Weight_Bias_Correction_Hidden(OutK, target_arr, OutJ, Hidden_Neurons, Output_Neurons, Input_Neurons, input_arr, wkj)
-            wji_new, bias_j_new, wkj_new, bias_k_new   = Weight_Bias_Update(wji, wkj, Hidden_Neurons, Input_Neurons, Output_Neurons, delta_WJ, bias_j, delta_bias_j, delta_wk, bias_k, delta_bias_k)
-
-            # Reassign wji, bias_j, wkj, bias_k
-            wji, bias_j, wkj, bias_k = wji_new, bias_j_new, wkj_new, bias_k_new 
-
-
-main()
