@@ -3,7 +3,7 @@ import numpy as np
 import cv2
 
 # read file and convert to grey scale
-file = "Part2/Dataset/CarPlate/7.jpg"
+file = "Part2/Dataset/CarPlate/10.jpg"
 img = Image.open(file).convert('L')
 img = ImageOps.exif_transpose(img) # Make sure image remains in original orientation
 
