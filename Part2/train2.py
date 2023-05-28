@@ -14,7 +14,7 @@ file_index = 1      # Using which file
 read = False
 
 while True: 
-    target_values = ["B", "F"]
+    target_values = ["B", "F", "L", "M", "P", "Q", "T", "U", "V", ""]
     alphabet = target_values[target_index]
     file = "Part2/Dataset/Alphabets/" + alphabet + "/" + str(file_index) + ".jpg"
 
