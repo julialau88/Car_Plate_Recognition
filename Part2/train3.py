@@ -5,9 +5,11 @@ import cv2
 from gaussian import gaussian
 from PIL import Image
 from unsharp import unsharp
+from sobel import sobel
+
 
 iter = 0
-max_iter = 20000
+max_iter = 10000
 error_threshold = 0.0005
 target_index = 0    # Train which letter
 file_index = 1      # Using which file 
@@ -38,33 +40,24 @@ while True:
 
     # Apply Canny edge detection to the image
     input_arr = gaussian(5, input_img)
+    input_arr = sobel(width, height, input_arr)
 
     # Image.fromarray(input_arr).show()
-    input_arr = cv2.Canny(np.array(input_img_arr), 100, 200)
-    _, threshold_image = cv2.threshold(input_arr, 0, 255, cv2.THRESH_BINARY+cv2.THRESH_OTSU)
-
-    # Image.fromarray(threshold_image).show()
-    input_arr = np.divide(threshold_image, 255)
-
     # input_arr = sobel(width, height, input_arr)
+    # print(input_arr)
+    ## Normalization 
+    x_max = np.max(input_arr)
+    x_min = np.min(input_arr)
+
+    for row in range(0, height):
+        for column in range(0, width):
+            input_arr[row][column] = (((input_arr[row][column] - x_min)/(x_max- x_min))*2) - 1
+
     input_arr = input_arr.flatten()
 
-    # Weight initialisation
-    # If value has been saved before, use those values 
-    # Else, initialise 
-    # try: 
-    #     print("I CAN READ")
-    #     wji = np.load("wji.npy")
-    #     wkj = np.load("wkj.npy")
-    #     bias_j = np.load("bias_j.npy")
-    #     bias_k = np.load("bias_k.npy")
-    # except FileNotFoundError:
-    #     print("INITIALISE ONCE")
     if not read:
         wji, wkj, bias_j, bias_k = Weight_Initialization(Input_Neurons, Hidden_Neurons, Output_Neurons)
         read = True
-    # print("WJI:", wji)
-    # print("WKJ:", wkj)
 
     print("=== ITER:",  iter)
     print("TRAINING ALPHABET", alphabet)

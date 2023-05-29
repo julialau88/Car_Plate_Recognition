@@ -22,7 +22,7 @@ def read_files(file):
     input_img = Image.open(file).convert('L')
     
     # # ###### Image resize 
-    size = (40,  50)  
+    size = (30,  20)  
     input_img =  input_img.resize(size)
 
     input_img_arr = np.array(input_img) 

@@ -45,20 +45,21 @@ for j in range(0, len(target_values)):
 
         # Apply Canny edge detection to the image
         input_arr = gaussian(5, input_img)
+        input_arr = sobel(width, height, input_arr)
 
         # Image.fromarray(input_arr).show()
-        input_arr = cv2.Canny(np.array(input_img_arr), 100, 200)
-        _, threshold_image = cv2.threshold(input_arr, 0, 255, cv2.THRESH_BINARY+cv2.THRESH_OTSU)
-
-        # Image.fromarray(threshold_image).show()
-
-        # Image.fromarray(threshold_image).show()
-        input_arr = np.divide(threshold_image, 255)
-
         # input_arr = sobel(width, height, input_arr)
+        # print(input_arr)
+        ## Normalization 
+        x_max = np.max(input_arr)
+        x_min = np.min(input_arr)
+
+        for row in range(0, height):
+            for column in range(0, width):
+                input_arr[row][column] = (((input_arr[row][column] - x_min)/(x_max- x_min))*2) - 1
+
         input_arr = input_arr.flatten()
 
-        # for l in range(0, )
 
         wji = np.load("wji.npy")
         wkj = np.load("wkj.npy")
@@ -70,7 +71,7 @@ for j in range(0, len(target_values)):
         print("TESTING ALPHABET", alphabet)
         print("TARGET ARR IS", target_arr)
         print("FILE IS", file)
-        print(input_arr)
+        # print(input_arr)
         NetJ = np.zeros(Hidden_Neurons)
         OutJ = np.zeros(Hidden_Neurons)
         NetJ, OutJ = Forward_Input_Hidden(Input_Neurons, Hidden_Neurons, input_arr, bias_j, NetJ, OutJ, wji)
@@ -82,4 +83,3 @@ for j in range(0, len(target_values)):
         print("THE RESULT IS:", OutK)
         max_index = np.argmax(OutK)
         print("THE RECOGNISED CHARACTER IS:", target_values[max_index])
-    break
