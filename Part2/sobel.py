@@ -12,7 +12,7 @@ def sobel(width, height, img_arr):
 
     # Clip range 0-255
     G = np.clip(G, 0, 255)
-    T = 150
+    T = 160
 
     for y in range(0, width):
         for x in range(0, height):

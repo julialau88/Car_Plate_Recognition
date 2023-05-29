@@ -9,8 +9,8 @@ from sobel import sobel
 
 
 iter = 0
-max_iter = 10000
-error_threshold = 0.0005
+max_iter = 20000
+error_threshold = 0.0001
 target_index = 0    # Train which letter
 file_index = 1      # Using which file 
 read = False
@@ -18,7 +18,8 @@ read = False
 while True: 
     target_values = ["B", "F", "L", "M", "P", "Q", "T", "U", "V", "W", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
     alphabet = target_values[target_index]
-    file = "Part2/Dataset/Alphabets/" + alphabet + "/" + str(file_index) + ".jpg"
+    file_index=1
+    file = "Part2/Dataset/Alphabets/" + "P" + "/" + str(file_index) + ".jpg"
 
     # Based on alphabet, set 1 
     target_arr = np.zeros(len(target_values))
@@ -28,6 +29,8 @@ while True:
 
      # Input arr is the image
     input_img, input_img_arr, width, height = read_files(file)
+
+    input_img.show()
 
     # Input_Neurons: Initialise total number of neurons
     Input_Neurons = width*height
@@ -41,6 +44,9 @@ while True:
     # Apply Canny edge detection to the image
     input_arr = gaussian(5, input_img)
     input_arr = sobel(width, height, input_arr)
+
+
+    exit()
 
     # Image.fromarray(input_arr).show()
     # input_arr = sobel(width, height, input_arr)
