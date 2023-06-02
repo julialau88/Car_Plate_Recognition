@@ -1,8 +1,9 @@
+"""
+ANN functions
+"""
 import numpy as np 
 from PIL import Image
-from scipy.signal import convolve2d
 import math
-from sobel import sobel
 
 ##### Step 1: initialisation of weights 
 def Weight_Initialization(Input_Neurons, Hidden_Neurons, Output_Neurons):
@@ -21,8 +22,8 @@ def read_files(file):
     # Ask the user to enter the number of input, hidden and output neurons.
     input_img = Image.open(file).convert('L')
     
-    # # ###### Image resize 
-    size = (30,  20)  
+    ####### Image resize 
+    size = (60,40)  
     input_img =  input_img.resize(size)
 
     input_img_arr = np.array(input_img) 
@@ -36,7 +37,6 @@ def Forward_Input_Hidden(Input_Neurons, Hidden_Neurons, input_img_arr, bias_j, N
     # Obtain the results at each neuron in the hidden layer
     # Initialise NetJ --> same size as hidden neurons 
 
-    # print(bias_j)
     # Loop through hidden neurons 
     for j in range(0, Hidden_Neurons):
         # For each hidden neuron. loop through input neurons to calculate NetJ
@@ -65,7 +65,6 @@ def Forward_Hidden_Output(wkj, Output_Neurons, Hidden_Neurons, OutJ, bias_k, Net
         NetK[k] += bias_k[k][0]
     
     # Calculate OutK with NetK
-    # print(NetK)
     for k in range(0,Output_Neurons):
         OutK[k] = 1/(1 + math.exp(-(NetK[k])))
     
@@ -77,18 +76,17 @@ def Check_for_End(OutK, target_arr, iter, max_iter, error_threshold):
     # Calculate total error 
     total_error = 0 
     error_arr = []
+
     ## Here want to set margin of error
     ## For example: if target value is 1, if ouput is 0.9, we consider it as pass
     for i in range(0, len(target_arr)):
-        # print(target_arr)
-        # print(OutK)
         error = 0.5*((target_arr[i] - OutK[i])**2)
         total_error += error
         error_arr.append(error)
         
-
     print("TOTAL ERROR IS",  total_error)
-    # returns true or false
+    
+    # Returns true or false
     if total_error <= error_threshold:
         print("ERROR THRESHOLD MET")
         return True, error_arr 
