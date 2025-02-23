@@ -2,6 +2,7 @@
 In this project, we propose an algorithm to detect car plates, along with training a neural network model to recognise the detect car plate values. The steps are detailed below: 
 
 ## Locating the car plate 
+The codes for the below steps are in the "preprocess_func" directory under "preprocess.py"
 ### 1. Preprocessing 
 Preprocessing steps are unsharp, histogram equalisation, and Gaussian blurring. 
 ![alt text](images/preprocess.png)
@@ -21,8 +22,8 @@ We estimate 3 window sizes that approximate possible car plate sizes to slide ac
 ![alt text](images/car_plate_location.png)
 
 ## Segment the located car plate 
-Using the same idea as Step 3 above. We segment the carplate into its corresponding characters based on the vertical projection graph. 
+Using the same idea as Step 3 above. We segment the carplate into its corresponding characters based on the vertical projection graph. The codes for this step and the next are in the "recognise" directory under "carplate_recognition.py"
 ![alt text](images/segmentation.png)
 
 ## Identify the characters
-A neural network is implemented from scratch and trained on images of characters to recognise the each character of the car plate. 
+A neural network is implemented from scratch and trained on images of characters to recognise the each character of the car plate. The training codes are in "train.py"
