@@ -1,3 +1,2 @@
-# FIT3081_Car_Plate_Recognition-
+# A model trained to recognise car plates
 
-Code for FIT3081 Assignment 2 Group A05.
