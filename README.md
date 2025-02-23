@@ -1,26 +1,21 @@
 # A model trained to recognise car plates
 In this project, we propose an algorithm to detect car plates, along with training a neural network model to recognise the detect car plate values. The steps are detailed below: 
 
-## Locating the vehicle in the image 
-### 1. Preprocess car plate images 
-The first step is to preprocess captured car plate images. Preprocessing steps include converting the image into grayscale and resizing the image. 
-
-### 2. Canny Edge Detection 
-The next step is to perform canny edge detection to get the edge image. 
-
-### 3. Masking 
-Masking is then performed to make the car in the image more protuding as compared to the background. The mask is created by using Floyd-Steinberg dithering to approximate the original image luminosity levels. The background has lower luminosity levels compared to the vehicle. After applying Floyd-Steinberg, the background has more white pixels compared to the vehicle in the image. The vehicle has higher luminosity levels compared to the background. With applying Floyd-Steinberg onto the image, the vehicle has more black pixels compared to the background. The mask is applied onto the car image. 
-
-### 4. Locating the car by choosing quadrant with most black pixels. 
-The image is split into 9 quadrants and we will locate which quadrant has the most black pixels. After obtaining the chosen quadrant with the most black pixels, the quadrant will be set as the centre of the cropping area and we will crop the car out of the image hence removing unnecessary background information. 
-
 ## Locating the car plate 
-After locating the vehicle, it is time to locate the car plate. 
 ### 1. Preprocessing 
-Preprocessing steps are unsharp, histogram equalisation, and Gaussian filtering. 
+Preprocessing steps are unsharp, histogram equalisation, and Gaussian blurring. 
 
 ### 2. Vertical Edge Detection
-Vertical Sobel is applied to detect vertical edges
+Vertical Sobel is applied to detect vertical edges. 
 
-### 3. Car plate location
-We estimate 3 window sizes that approximate possible car plate sizes to slide across the car image (with background removed using above step) to locate the car plate. We leverage the 
+### 3. Edge Filtering
+We estimate 3 window sizes that approximate possible car plate sizes to slide across the preprocessed car image to locate the car plate. We first slide the windows across the car image to remove edge noises. Any vertical edges longer than the estimated car plate height will be removed and vertical edges that are too short to be used to identify the car plate will be removed too.
+
+### 4. Car plate location
+We leverage the colours of a common Malaysian car plate for car plate detection. A Malaysian car plate has white characters and a black background. Leveraging this information, we slide the windows across the car image and look for candidates that have similar patterns. For each window, we count the number of white pixels for each column to get the vertical projection histogram. A car plate should have a vertical projection similar to the image shown below, with peaks indicating the characters (a lot of white pixels) and troughs indicating the gaps (lack of white pixels). 
+
+## Segment the located car plate 
+Using the same idea as Step 3 above. We segment the carplate into its corresponding characters. 
+
+## Identify the characters
+A neural network is implemented from scratch and trained on images of characters to recognise the each character of the car plate. 
