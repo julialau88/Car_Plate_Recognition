@@ -4,6 +4,7 @@ In this project, we propose an algorithm to detect car plates, along with traini
 ## Locating the car plate 
 ### 1. Preprocessing 
 Preprocessing steps are unsharp, histogram equalisation, and Gaussian blurring. 
+![alt text](images/preprocess.png)
 
 ### 2. Vertical Edge Detection
 Vertical Sobel is applied to detect vertical edges. 
