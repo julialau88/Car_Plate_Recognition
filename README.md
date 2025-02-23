@@ -12,7 +12,7 @@ Vertical Sobel is applied to detect vertical edges.
 
 ### 3. Edge Filtering
 We remove edge noises. Any vertical edges longer than the estimated car plate height will be removed and vertical edges that are too short to be used to identify the car plate will be removed too.
-![alt text](images/vertical_sobel.png)
+<img src="images/vertical_sobel.png" alt="Alt Text" style="width:50%; height:auto;">
 
 ### 4. Car plate location
 We estimate 3 window sizes that approximate possible car plate sizes to slide across the preprocessed car image to locate the car plate. We leverage the colours of a common Malaysian car plate for car plate detection. A Malaysian car plate has white characters and a black background. Leveraging this information, we slide the windows across the car image and look for candidates that have similar patterns. For each window, we count the number of white pixels for each column to get the vertical projection histogram. A car plate should have a vertical projection similar to the image shown below, with peaks indicating the characters (a lot of white pixels) and troughs indicating the gaps (lack of white pixels). 
