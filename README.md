@@ -20,7 +20,7 @@ We estimate 3 window sizes that approximate possible car plate sizes to slide ac
 
 ## Segment the located car plate 
 Using the same idea as Step 3 above. We segment the carplate into its corresponding characters based on the vertical projection graph. 
-![alt text](images/segmentation.png)
+![alt text](images/segmentation.png | width=100)
 
 ## Identify the characters
 A neural network is implemented from scratch and trained on images of characters to recognise the each character of the car plate. 
